@@ -24,12 +24,16 @@ function Sidebar() {
         <Link to="/" style={linkStyle}>🏠 Dashboard</Link>
 
         <Link to="/calendar" style={linkStyle}>📅 Calendar</Link>
+        <Link to="/bills">
+  💰 Bills
+</Link>
 
-        <Link to="/hotels" style={linkStyle}>🏨 Hotels</Link>
+        
 
         <Link to="/reports" style={linkStyle}>📊 Reports</Link>
 
         <Link to="/settings" style={linkStyle}>⚙ Settings</Link>
+        
       </nav>
     </div>
   );

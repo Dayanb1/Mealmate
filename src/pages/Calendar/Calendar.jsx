@@ -1,9 +1,40 @@
-import { useState } from "react";
+import CalendarGrid from "../../components/Calendar/CalendarGrid";
+import MonthNavigation from "../../components/Calendar/MonthNavigation";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 import MealModal from "../../components/Calendar/MealModal";
-function Calendar({ mealData, setMealData }) {
+
+function Calendar({
+  mealData,
+  setMealData,
+  selectedDate,
+  setSelectedDate,
+  loadMeals,
+}) {
   const [selectedDay, setSelectedDay] = useState(null);
   
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+
+
+  
+
+  function getMealDate(day) {
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1;
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+  const daysInMonth = new Date(
+  selectedDate.getFullYear(),
+  selectedDate.getMonth() + 1,
+  0
+).getDate();
+
+const days = Array.from(
+  { length: daysInMonth },
+  (_, i) => i + 1
+);
+  
 
   return (
     <div className="space-y-8">
@@ -20,107 +51,70 @@ function Calendar({ mealData, setMealData }) {
 
       <div className="bg-white rounded-2xl shadow-md p-6">
 
-        <div className="flex justify-between items-center mb-6">
+        <MonthNavigation
+  currentDate={selectedDate}
+  setCurrentDate={setSelectedDate}
+/>
 
-          <h2 className="text-2xl font-bold">
-            August 2026
-          </h2>
-
-          <div className="flex gap-2">
-
-            <button className="px-4 py-2 bg-gray-200 rounded-lg">
-              ◀
-            </button>
-
-            <button className="px-4 py-2 bg-gray-200 rounded-lg">
-              ▶
-            </button>
-
-          </div>
-
-        </div>
-
-        <div className="grid grid-cols-7 gap-4">
-
-          {[
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat",
-          ].map((day) => (
-            <div
-              key={day}
-              className="font-bold text-center"
-            >
-              {day}
-            </div>
-          ))}
-
-          {days.map((day) => (
-  <div
-    key={day}
-    onClick={() => setSelectedDay(day)}
-    className="
-      h-24
-      border
-      rounded-xl
-      flex
-      items-center
-      justify-center
-      cursor-pointer
-      hover:bg-green-100
-      transition
-    "
-  >
-    <div className="text-center">
-
-      <div className="text-xl font-semibold">
-        {day}
-      </div>
-
-      {mealData[day] && (
-        <div className="mt-2 text-2xl">
-          {mealData[day].split(" ")[0]}
-        </div>
-      )}
-
-    </div>
-  </div>
-))}
-
-        </div>
+        <CalendarGrid
+  currentDate={selectedDate}
+  mealData={mealData}
+  setSelectedDay={setSelectedDay}
+/>
 
       </div>
+
       {selectedDay && (
-  <MealModal
-    selectedDay={selectedDay}
-    currentStatus={mealData[selectedDay]}
-    onClose={() => setSelectedDay(null)}
-    onSave={(status) => {
-      setMealData({
-        ...mealData,
-        [selectedDay]: status,
-      });
+        <MealModal
+          selectedDay={selectedDay}
+          currentStatus={mealData[selectedDay]}
+          onClose={() => setSelectedDay(null)}
 
-      setSelectedDay(null);
-    }}
-    onDelete={() => {
-      const updatedData = { ...mealData };
+          onSave={async (status) => {
 
-      delete updatedData[selectedDay];
+            const { error } = await supabase
+              .from("meals_v2")
+              .upsert(
+  {
+    meal_date: getMealDate(selectedDay),
+    status: status,
+  },
+  {
+    onConflict: "meal_date",
+  }
+);
 
-      setMealData(updatedData);
+            if (error) {
+              console.error(error);
+              alert(error.message);
+              return;
+            }
 
-      setSelectedDay(null);
-    }}
-  />
-)}
-          
-        
-      
+            await loadMeals();
+
+            setSelectedDay(null);
+          }}
+
+          onDelete={async () => {
+
+            const { error } = await supabase
+              .from("meals_v2")
+              .delete()
+              .eq("meal_date", getMealDate(selectedDay));
+
+            if (error) {
+              console.error(error);
+              alert(error.message);
+              return;
+            }
+
+            await loadMeals();
+
+            setSelectedDay(null);
+          }}
+
+        />
+      )}
 
     </div>
   );

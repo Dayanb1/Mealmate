@@ -2,18 +2,39 @@ import DashboardCard from "../../components/DashboardCard.jsx";
 import StatusCard from "../../components/StatusCard.jsx";
 import ActivityCard from "../../components/ActivityCard.jsx";
 
-function Dashboard({ mealData }) {
+function Dashboard({
+  mealData,
+  mealPrice,
+  monthlyAdvance,
+}) {
     const totalMeals = Object.values(mealData).filter(
   (status) => status === "🍛 Ate Meal"
 ).length;
 
-const mealPrice = 80;
+
 
 const currentBill = totalMeals * mealPrice;
 
-const pendingDays = 31 - Object.keys(mealData).length;
+const selectedDate = new Date();
 
-const advance = 1000;
+const totalDays = new Date(
+  selectedDate.getFullYear(),
+  selectedDate.getMonth() + 1,
+  0
+).getDate();
+
+const pendingDays = totalDays - Object.keys(mealData).length;
+const remainingBalance = monthlyAdvance - currentBill;
+
+const balanceColor =
+  remainingBalance >= 0 ? "#16a34a" : "#dc2626";
+
+const balanceTitle =
+  remainingBalance >= 0
+    ? "Advance Left"
+    : "Need To Pay";
+
+
   return (
     <div className="space-y-8">
       <div>
@@ -23,7 +44,8 @@ const advance = 1000;
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+
         <DashboardCard
           title="Meals This Month"
           value={totalMeals}
@@ -38,9 +60,14 @@ const advance = 1000;
 
         <DashboardCard
           title="Advance"
-          value="₹1000"
+          value={`₹${monthlyAdvance}`}
           color="#ea580c"
         />
+        <DashboardCard
+  title={balanceTitle}
+  value={`₹${Math.abs(remainingBalance)}`}
+  color={balanceColor}
+/>
 
         <DashboardCard
           title="Pending Days"
@@ -50,6 +77,55 @@ const advance = 1000;
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-md p-6">
+
+  <h2 className="text-2xl font-bold mb-6">
+    Monthly Summary
+  </h2>
+
+  <div className="space-y-4">
+
+    <div className="flex justify-between">
+      <span>Meal Price</span>
+      <span>₹{mealPrice}</span>
+    </div>
+
+    <div className="flex justify-between">
+      <span>Meals Eaten</span>
+      <span>{totalMeals}</span>
+    </div>
+
+    <div className="flex justify-between">
+      <span>Meal Cost</span>
+      <span>₹{currentBill}</span>
+    </div>
+
+    <div className="flex justify-between">
+      <span>Advance</span>
+      <span>₹{monthlyAdvance}</span>
+    </div>
+
+    <hr />
+
+    <div className="flex justify-between text-lg font-bold">
+
+      <span>{balanceTitle}</span>
+
+      <span
+        className={
+          remainingBalance >= 0
+            ? "text-green-600"
+            : "text-red-600"
+        }
+      >
+        ₹{Math.abs(remainingBalance)}
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
         <StatusCard />
         <ActivityCard />
       </div>
