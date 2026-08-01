@@ -95,20 +95,32 @@ function Calendar({ mealData, setMealData }) {
 
       </div>
       {selectedDay && (
-        <MealModal
-          selectedDay={selectedDay}
-          onClose={() => setSelectedDay(null)}
-          onSave={(status) => {
-            setMealData({
-      ...mealData,
-      [selectedDay]: status,
-    });
-    setSelectedDay(null);
+  <MealModal
+    selectedDay={selectedDay}
+    currentStatus={mealData[selectedDay]}
+    onClose={() => setSelectedDay(null)}
+    onSave={(status) => {
+      setMealData({
+        ...mealData,
+        [selectedDay]: status,
+      });
 
-  }}
+      setSelectedDay(null);
+    }}
+    onDelete={() => {
+      const updatedData = { ...mealData };
+
+      delete updatedData[selectedDay];
+
+      setMealData(updatedData);
+
+      setSelectedDay(null);
+    }}
+  />
+)}
           
-        />
-      )}
+        
+      
 
     </div>
   );
