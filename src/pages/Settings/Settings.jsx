@@ -1,26 +1,30 @@
+import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
-function Settings({
-  selectedDate,
-}) {
+function Settings({ selectedDate }) {
+  const { user } = useAuth();
+
   const [mealPrice, setMealPrice] = useState("");
   const [advance, setAdvance] = useState("");
 
   useEffect(() => {
-  loadSettings();
-}, [selectedDate]);
+    loadSettings();
+  }, [selectedDate, user]);
 
   async function loadSettings() {
   const month = selectedDate.getMonth() + 1;
   const year = selectedDate.getFullYear();
 
-  const { data, error } = await supabase
-    .from("monthly_settings")
-    .select("*")
-    .eq("month", month)
-    .eq("year", year)
-    .maybeSingle();
+  if (!user) return;
+
+const { data, error } = await supabase
+  .from("monthly_settings")
+  .select("*")
+  .eq("user_id", user.id)
+  .eq("month", month)
+  .eq("year", year)
+  .maybeSingle();
 
   if (error) {
     console.error(error);
@@ -44,13 +48,14 @@ function Settings({
     .from("monthly_settings")
     .upsert(
       {
-        month,
-        year,
-        meal_price: Number(mealPrice),
-        monthly_advance: Number(advance || 0),
-      },
+  user_id: user.id,
+  month,
+  year,
+  meal_price: Number(mealPrice),
+  monthly_advance: Number(advance || 0),
+},
       {
-        onConflict: "month,year",
+        onConflict: "user_id,month,year",
       }
     );
 
@@ -69,13 +74,14 @@ function Settings({
     .from("monthly_settings")
     .upsert(
       {
-        month,
-        year,
-        meal_price: Number(mealPrice || 0),
-        monthly_advance: Number(advance),
-      },
+  user_id: user.id,
+  month,
+  year,
+  meal_price: Number(mealPrice || 0),
+  monthly_advance: Number(advance),
+},
       {
-        onConflict: "month,year",
+        onConflict: "user_id,month,year",
       }
     );
 

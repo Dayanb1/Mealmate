@@ -1,4 +1,9 @@
 
+import Login from "./pages/Auth/Login";
+import Signup from "./pages/Auth/Signup";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 import Bills from "./pages/Bills/Bills";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
@@ -14,6 +19,7 @@ import Reports from "./pages/Reports/Reports";
 import Settings from "./pages/Settings/Settings";
 
 function App() {
+  const { user } = useAuth();
   const [mealData, setMealData] = useState({});
   const [selectedDate, setSelectedDate] = useState(() => {
   const savedDate = localStorage.getItem("selectedDate");
@@ -24,14 +30,16 @@ function App() {
 
   return new Date();
 });
-  const [mealPrice, setMealPrice] = useState(80);
+  const [mealPrice, setMealPrice] = useState(80); 
   const [monthlyAdvance, setMonthlyAdvance] = useState(1000);
   
 
 useEffect(() => {
-  loadSettings();
-  loadMeals();
-}, [selectedDate]);
+  if (user) {
+    loadSettings();
+    loadMeals();
+  }
+}, [selectedDate, user]);
 useEffect(() => {
   localStorage.setItem(
     "selectedDate",
@@ -40,12 +48,15 @@ useEffect(() => {
 }, [selectedDate]);
 
 async function loadSettings() {
+  if (!user) return;
+
   const month = selectedDate.getMonth() + 1;
   const year = selectedDate.getFullYear();
 
   const { data, error } = await supabase
     .from("monthly_settings")
     .select("*")
+    .eq("user_id", user.id)
     .eq("month", month)
     .eq("year", year)
     .maybeSingle();
@@ -64,6 +75,8 @@ async function loadSettings() {
   }
 }
 async function loadMeals() {
+  if (!user) return;
+
   const year = selectedDate.getFullYear();
   const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
 
@@ -80,6 +93,7 @@ async function loadMeals() {
   const { data, error } = await supabase
     .from("meals_v2")
     .select("*")
+    .eq("user_id", user.id)
     .gte("meal_date", startDate)
     .lte("meal_date", endDate);
 
@@ -113,36 +127,46 @@ async function loadMeals() {
               <Route
   path="/bills"
   element={
-    <Bills
-  mealData={mealData}
-  mealPrice={mealPrice}
-  monthlyAdvance={monthlyAdvance}
-  selectedDate={selectedDate}
-/>
+    <ProtectedRoute>
+  <Bills
+    mealData={mealData}
+    mealPrice={mealPrice}
+    monthlyAdvance={monthlyAdvance}
+    selectedDate={selectedDate}
+  />
+</ProtectedRoute>
   }
 />
 
-              <Route path="/"
+              <Route path="/login" element={<Login />} />
+
+<Route path="/signup" element={<Signup />} />
+              <Route
+  path="/"
   element={
-    
-    <Dashboard
-      mealData={mealData}
-  mealPrice={mealPrice}
-  monthlyAdvance={monthlyAdvance}
-  selectedDate={selectedDate}
-    />
-  } />
+    <ProtectedRoute>
+      <Dashboard
+        mealData={mealData}
+        mealPrice={mealPrice}
+        monthlyAdvance={monthlyAdvance}
+        selectedDate={selectedDate}
+      />
+    </ProtectedRoute>
+  }
+/>
 
               <Route
   path="/calendar"
   element={
-    <Calendar
-  mealData={mealData}
-  setMealData={setMealData}
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-  loadMeals={loadMeals}
-/>
+    <ProtectedRoute>
+  <Calendar
+    mealData={mealData}
+    setMealData={setMealData}
+    selectedDate={selectedDate}
+    setSelectedDate={setSelectedDate}
+    loadMeals={loadMeals}
+  />
+</ProtectedRoute>
   }
 />
 
@@ -150,20 +174,24 @@ async function loadMeals() {
 
               <Route path="/reports"
   element={
-    <Reports
-  mealData={mealData}
-  mealPrice={mealPrice}
-  monthlyAdvance={monthlyAdvance}
-  selectedDate={selectedDate}
-/>
+    <ProtectedRoute>
+  <Reports
+    mealData={mealData}
+    mealPrice={mealPrice}
+    monthlyAdvance={monthlyAdvance}
+    selectedDate={selectedDate}
+  />
+</ProtectedRoute>
   } />
 
               <Route
   path="/settings"
   element={
-    <Settings
-      selectedDate={selectedDate}
-    />
+    <ProtectedRoute>
+  <Settings
+    selectedDate={selectedDate}
+  />
+</ProtectedRoute>
   }
 />
 

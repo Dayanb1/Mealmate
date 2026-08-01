@@ -1,48 +1,59 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Sidebar() {
+  const location = useLocation();
+
+  const menus = [
+    { name: "Dashboard", icon: "🏠", path: "/" },
+    { name: "Calendar", icon: "📅", path: "/calendar" },
+    { name: "Bills", icon: "💰", path: "/bills" },
+    { name: "Reports", icon: "📊", path: "/reports" },
+    { name: "Settings", icon: "⚙", path: "/settings" },
+  ];
+
   return (
-    <div
-      style={{
-        width: "240px",
-        background: "#1f2937",
-        color: "white",
-        minHeight: "100vh",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <h2 style={{ marginBottom: "40px" }}>🍛 MealMate</h2>
+    <aside className="hidden md:flex w-64 bg-gray-900 text-white flex-col min-h-screen shadow-xl">
 
-      <nav
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-        }}
-      >
-        <Link to="/" style={linkStyle}>🏠 Dashboard</Link>
+      <div className="p-6 border-b border-gray-700">
+        <h1 className="text-3xl font-bold">
+          🍛 MealMate
+        </h1>
 
-        <Link to="/calendar" style={linkStyle}>📅 Calendar</Link>
-        <Link to="/bills">
-  💰 Bills
-</Link>
+        <p className="text-gray-400 text-sm mt-2">
+          Meal Tracking System
+        </p>
+      </div>
 
-        
+      <nav className="flex-1 p-4 space-y-2">
 
-        <Link to="/reports" style={linkStyle}>📊 Reports</Link>
+        {menus.map((menu) => (
+          <Link
+            key={menu.path}
+            to={menu.path}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+              location.pathname === menu.path
+                ? "bg-green-600"
+                : "hover:bg-gray-800"
+            }`}
+          >
+            <span className="text-xl">
+              {menu.icon}
+            </span>
 
-        <Link to="/settings" style={linkStyle}>⚙ Settings</Link>
-        
+            <span className="font-medium">
+              {menu.name}
+            </span>
+          </Link>
+        ))}
+
       </nav>
-    </div>
+
+      <div className="p-4 border-t border-gray-700 text-center text-gray-400 text-sm">
+        Version 1.0
+      </div>
+
+    </aside>
   );
 }
-
-const linkStyle = {
-  color: "white",
-  textDecoration: "none",
-  fontSize: "18px",
-};
 
 export default Sidebar;

@@ -1,6 +1,7 @@
+import { useAuth } from "../../context/AuthContext";
 import CalendarGrid from "../../components/Calendar/CalendarGrid";
 import MonthNavigation from "../../components/Calendar/MonthNavigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import MealModal from "../../components/Calendar/MealModal";
 
@@ -11,10 +12,10 @@ function Calendar({
   setSelectedDate,
   loadMeals,
 }) {
+
+  const { user } = useAuth();
+
   const [selectedDay, setSelectedDay] = useState(null);
-  
-
-
 
   
 
@@ -71,16 +72,19 @@ const days = Array.from(
           onClose={() => setSelectedDay(null)}
 
           onSave={async (status) => {
+              console.log("Saving status:", status);
+
 
             const { error } = await supabase
               .from("meals_v2")
               .upsert(
   {
+    user_id: user.id,
     meal_date: getMealDate(selectedDay),
     status: status,
   },
   {
-    onConflict: "meal_date",
+    onConflict: "user_id,meal_date",
   }
 );
 
@@ -98,9 +102,10 @@ const days = Array.from(
           onDelete={async () => {
 
             const { error } = await supabase
-              .from("meals_v2")
-              .delete()
-              .eq("meal_date", getMealDate(selectedDay));
+  .from("meals_v2")
+  .delete()
+  .eq("user_id", user.id)
+  .eq("meal_date", getMealDate(selectedDay));
 
             if (error) {
               console.error(error);
