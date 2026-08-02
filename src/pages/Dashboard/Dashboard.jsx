@@ -23,7 +23,11 @@ const totalDays = new Date(
   0
 ).getDate();
 
-const pendingDays = totalDays - Object.keys(mealData).length;
+const completedDays = Object.values(mealData).filter(
+  (status) => status
+).length;
+
+const pendingDays = totalDays - completedDays;
 const remainingBalance = monthlyAdvance - currentBill;
 
 const balanceColor =

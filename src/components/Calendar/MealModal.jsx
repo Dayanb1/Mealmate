@@ -17,10 +17,17 @@ function MealModal({
   ];
 
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [customReason, setCustomReason] = useState("");
 
   useEffect(() => {
+  if (currentStatus && !reasons.includes(currentStatus)) {
+    setSelectedStatus("➕ Other");
+    setCustomReason(currentStatus);
+  } else {
     setSelectedStatus(currentStatus || "");
-  }, [currentStatus]);
+    setCustomReason("");
+  }
+}, [currentStatus]);
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
@@ -49,6 +56,15 @@ function MealModal({
               {item}
             </button>
           ))}
+          {selectedStatus === "➕ Other" && (
+  <input
+    type="text"
+    placeholder="Enter your reason..."
+    value={customReason}
+    onChange={(e) => setCustomReason(e.target.value)}
+    className="w-full border rounded-xl p-3 mt-3"
+  />
+)}
 
         </div>
 
@@ -73,7 +89,11 @@ function MealModal({
           <button
             onClick={() => {
               if (selectedStatus) {
-                onSave(selectedStatus);
+                onSave(
+  selectedStatus === "➕ Other"
+    ? customReason
+    : selectedStatus
+);
               }
             }}
             className="flex-1 bg-green-600 text-white rounded-xl py-3"
