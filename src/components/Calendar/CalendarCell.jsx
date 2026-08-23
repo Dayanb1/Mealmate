@@ -12,11 +12,11 @@ function CalendarCell({
 
     // Ate Meal → light premium green
     if (status === "🍛 Ate Meal") {
-      return "bg-green-50 border-green-300 hover:bg-green-100";
+      return "bg-green-100 border-green-400 hover:bg-green-200";
     }
 
     // Everything else → light premium red
-    return "bg-red-50 border-red-300 hover:bg-red-100";
+    return "bg-red-100 border-red-400 hover:bg-red-200";
   }
 
   return (
