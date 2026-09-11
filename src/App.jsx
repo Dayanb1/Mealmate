@@ -146,11 +146,12 @@ async function loadMeals() {
   element={
     <ProtectedRoute>
       <Dashboard
-        mealData={mealData}
-        mealPrice={mealPrice}
-        monthlyAdvance={monthlyAdvance}
-        selectedDate={selectedDate}
-      />
+  mealData={mealData}
+  mealPrice={mealPrice}
+  monthlyAdvance={monthlyAdvance}
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+/>
     </ProtectedRoute>
   }
 />
