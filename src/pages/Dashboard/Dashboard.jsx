@@ -247,8 +247,8 @@ const balanceTitle =
           </h2>
 
           <div className="text-4xl font-bold text-red-600 mb-6">
-            ₹{Math.max(finalAmountToPay, 0)}
-          </div>
+  ₹{totalAmountToSettle}
+</div>
 
           <div className="space-y-3">
             <div className="flex justify-between">
