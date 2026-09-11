@@ -1,12 +1,117 @@
 import DashboardCard from "../../components/DashboardCard.jsx";
-import StatusCard from "../../components/StatusCard.jsx";
-import ActivityCard from "../../components/ActivityCard.jsx";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 
 function Dashboard({
   mealData,
   mealPrice,
   monthlyAdvance,
+  selectedDate,
 }) {
+    const { user } = useAuth();
+
+  const [previousDues, setPreviousDues] = useState([]);
+  const [totalPreviousDue, setTotalPreviousDue] = useState(0);
+
+  useEffect(() => {
+    loadPreviousDues();
+  }, [user, selectedDate]);
+
+  async function loadPreviousDues() {
+  if (!user) return;
+
+  const currentYear = selectedDate.getFullYear();
+  const currentMonth = selectedDate.getMonth() + 1;
+
+  // Get all previous monthly settings
+  const { data: settingsData, error: settingsError } = await supabase
+    .from("monthly_settings")
+    .select("*")
+    .eq("user_id", user.id);
+
+  if (settingsError) {
+    console.error(settingsError);
+    return;
+  }
+
+  // Get all meals before the current month
+  const currentMonthStart = `${currentYear}-${String(currentMonth).padStart(2, "0")}-01`;
+
+  const { data: mealsData, error: mealsError } = await supabase
+    .from("meals_v2")
+    .select("*")
+    .eq("user_id", user.id)
+    .lt("meal_date", currentMonthStart);
+
+  if (mealsError) {
+    console.error(mealsError);
+    return;
+  }
+
+  // Group meals by month
+  const monthlyMeals = {};
+
+  mealsData.forEach((meal) => {
+    const monthKey = meal.meal_date.slice(0, 7);
+
+    if (!monthlyMeals[monthKey]) {
+      monthlyMeals[monthKey] = 0;
+    }
+
+    if (meal.status === "🍛 Ate Meal") {
+      monthlyMeals[monthKey]++;
+    }
+  });
+
+  // Sort previous months from oldest to newest
+  const previousSettings = settingsData
+    .filter((item) => {
+      if (!item.month || !item.year) return false;
+
+      if (item.year < currentYear) return true;
+
+      return item.year === currentYear && item.month < currentMonth;
+    })
+    .sort((a, b) => {
+      if (a.year !== b.year) {
+        return a.year - b.year;
+      }
+
+      return a.month - b.month;
+    });
+
+  let runningDue = 0;
+  const pendingMonths = [];
+
+  previousSettings.forEach((setting) => {
+    const monthKey = `${setting.year}-${String(setting.month).padStart(2, "0")}`;
+
+    const meals = monthlyMeals[monthKey] || 0;
+
+    const bill = meals * Number(setting.meal_price || 0);
+    const advance = Number(setting.monthly_advance || 0);
+
+    // Previous due + this month's bill - this month's advance
+    runningDue = runningDue + bill - advance;
+
+    if (runningDue > 0) {
+      pendingMonths.push({
+        month: setting.month,
+        year: setting.year,
+        amount: runningDue,
+      });
+    } else {
+      runningDue = 0;
+    }
+  });
+
+  // Latest 3 months which had pending dues
+  const latestThree = pendingMonths.slice(-3).reverse();
+
+  setPreviousDues(latestThree);
+  setTotalPreviousDue(runningDue);
+}
     const totalMeals = Object.values(mealData).filter(
   (status) => status === "🍛 Ate Meal"
 ).length;
@@ -15,7 +120,7 @@ function Dashboard({
 
 const currentBill = totalMeals * mealPrice;
 
-const selectedDate = new Date();
+
 
 const totalDays = new Date(
   selectedDate.getFullYear(),
@@ -30,6 +135,11 @@ const completedDays = Object.values(mealData).filter(
 const pendingDays = totalDays - completedDays;
 const remainingBalance = monthlyAdvance - currentBill;
 
+const totalAmountToSettle =
+  totalPreviousDue + currentBill;
+
+const finalAmountToPay =
+  totalAmountToSettle - monthlyAdvance;
 const balanceColor =
   remainingBalance >= 0 ? "#16a34a" : "#dc2626";
 
@@ -130,8 +240,74 @@ const balanceTitle =
   </div>
 
 </div>
-        <StatusCard />
-        <ActivityCard />
+                {/* Total Amount to Settle */}
+        <div className="bg-white rounded-2xl shadow-md p-6">
+          <h2 className="text-2xl font-bold mb-6">
+            💰 Total Amount to Settle
+          </h2>
+
+          <div className="text-4xl font-bold text-red-600 mb-6">
+            ₹{Math.max(finalAmountToPay, 0)}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span>Previous Pending Due</span>
+              <span className="font-semibold">
+                ₹{totalPreviousDue}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Current Month Bill</span>
+              <span className="font-semibold">
+                ₹{currentBill}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Current Month Advance</span>
+              <span className="font-semibold text-green-600">
+                - ₹{monthlyAdvance}
+              </span>
+            </div>
+          </div>
+
+          {previousDues.length > 0 && (
+            <>
+              <hr className="my-6" />
+
+              <h3 className="text-lg font-bold mb-4">
+                Previous Pending Dues
+              </h3>
+
+              <div className="space-y-3">
+                {previousDues.map((due) => (
+                  <div
+                    key={`${due.year}-${due.month}`}
+                    className="flex justify-between items-center bg-red-50 border border-red-100 rounded-xl p-3"
+                  >
+                    <span className="font-medium">
+                      {new Date(
+                        due.year,
+                        due.month - 1
+                      ).toLocaleString("en-IN", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </span>
+
+                    <span className="font-bold text-red-600">
+                      ₹{due.amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        
       </div>
     </div>
   );
