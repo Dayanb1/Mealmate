@@ -21,10 +21,11 @@ function Header() {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b px-6 py-4">
-      <div className="flex justify-between items-center">
+    <header className="bg-white shadow-sm border-b px-4 md:px-6 py-4">
+      <div className="flex justify-between items-center gap-4">
 
-        <div>
+        {/* Left side */}
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold">
             Welcome 👋
           </h1>
@@ -34,54 +35,68 @@ function Header() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Right side */}
+        <div className="flex items-center gap-2 md:gap-4">
 
-          <button className="text-2xl hover:scale-110 transition">
+          {/* Notification */}
+          <button
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-2xl transition hover:bg-slate-100 hover:scale-110"
+            title="Notifications"
+          >
             🔔
           </button>
 
-          <button className="text-2xl hover:scale-110 transition">
+          {/* Theme */}
+          <button
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-2xl transition hover:bg-slate-100 hover:scale-110"
+            title="Theme"
+          >
             🌙
           </button>
 
           {/* Profile */}
           <div className="relative">
+
             <button
               onClick={() => setShowProfile(!showProfile)}
-              className="text-2xl hover:scale-110 transition"
+              className="flex h-11 w-11 items-center justify-center rounded-xl text-2xl transition hover:bg-slate-100 hover:scale-110"
+              title="Account"
             >
               👤
             </button>
 
             {showProfile && (
-              <div className="absolute right-0 top-12 w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-50">
+              <div className="absolute right-0 top-14 z-50 w-72 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
 
-                <h3 className="font-bold text-lg mb-3">
+                <h3 className="text-lg font-bold text-slate-900">
                   Account
                 </h3>
 
-                <div className="text-sm text-gray-600">
-                  <p className="font-medium text-gray-800">
+                <div className="mt-4 rounded-xl bg-slate-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Logged in as
                   </p>
 
-                  <p className="mt-1 break-all">
+                  <p className="mt-2 break-all text-sm font-medium text-slate-800">
                     {user?.email}
                   </p>
                 </div>
 
               </div>
             )}
+
           </div>
 
+          {/* Logout */}
           <button
             onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg transition"
+            className="rounded-xl bg-gradient-to-r from-red-600 to-rose-500 px-4 md:px-5 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             Logout
           </button>
 
         </div>
+
       </div>
     </header>
   );
