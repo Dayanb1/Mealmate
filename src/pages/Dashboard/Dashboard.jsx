@@ -166,7 +166,37 @@ function Dashboard({
       <div className="pointer-events-none absolute top-96 -left-20 h-72 w-72 rounded-full bg-amber-300/10 blur-3xl" />
 
       {/* 3D HERO SECTION */}
-      <div className="premium-section relative min-h-[460px] overflow-hidden rounded-3xl">
+<div className="premium-section dashboard-nature relative min-h-[460px] overflow-hidden rounded-3xl">
+
+  {/* Nature opening animation */}
+  <span className="nature-particle nature-leaf nature-1">
+    🍃
+  </span>
+
+  <span className="nature-particle nature-flower nature-2">
+    🌸
+  </span>
+
+  <span className="nature-particle nature-leaf nature-3">
+    🌿
+  </span>
+
+  <span className="nature-particle nature-flower nature-4">
+    🌼
+  </span>
+
+  <span className="nature-particle nature-leaf nature-5">
+    🍃
+  </span>
+
+  <span className="nature-particle nature-flower nature-6">
+    🌷
+  </span>
+
+  <span className="nature-particle nature-leaf nature-7">
+    🌿
+  </span>
+  
 
         {/* Generated 3D scene */}
         <img
