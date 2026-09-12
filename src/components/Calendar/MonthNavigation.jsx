@@ -23,27 +23,37 @@ function MonthNavigation({
   }
 
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col items-start gap-4">
 
-      <h2 className="text-2xl font-bold">
-        {currentDate.toLocaleString("default", {
-          month: "long",
-          year: "numeric",
-        })}
-      </h2>
+      {/* Selected Month */}
+      <div className="premium-card rounded-2xl px-5 py-3">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-purple-600">
+          Selected Month
+        </p>
 
-      <div className="flex gap-2">
+        <h2 className="mt-1 text-2xl font-black text-slate-900">
+          {currentDate.toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          })}
+        </h2>
+      </div>
+
+      {/* Navigation Buttons BELOW month */}
+      <div className="flex gap-3">
 
         <button
           onClick={previousMonth}
-          className="px-4 py-2 bg-gray-200 rounded-lg"
+          className="premium-month-button flex h-11 w-14 items-center justify-center rounded-2xl text-xl font-bold text-slate-700"
+          aria-label="Previous month"
         >
           ◀
         </button>
 
         <button
           onClick={nextMonth}
-          className="px-4 py-2 bg-gray-200 rounded-lg"
+          className="premium-month-button flex h-11 w-14 items-center justify-center rounded-2xl text-xl font-bold text-slate-700"
+          aria-label="Next month"
         >
           ▶
         </button>

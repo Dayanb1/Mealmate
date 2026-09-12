@@ -89,10 +89,9 @@ function Dashboard({
     const pendingMonths = [];
 
     previousSettings.forEach((setting) => {
-      const monthKey = `${setting.year}-${String(setting.month).padStart(
-        2,
-        "0"
-      )}`;
+      const monthKey = `${setting.year}-${String(
+        setting.month
+      ).padStart(2, "0")}`;
 
       const meals = monthlyMeals[monthKey] || 0;
 
@@ -159,195 +158,481 @@ function Dashboard({
       : "Need To Pay";
 
   return (
-    <div className="space-y-8">
+    <div className="premium-dashboard relative space-y-8 pb-10">
 
-      {/* Dashboard Header + Month Navigation */}
-      <div>
-        <h1 className="text-4xl font-bold">
-          Dashboard
-        </h1>
+      {/* Background glow */}
+      <div className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full bg-purple-300/20 blur-3xl" />
 
-        <p className="text-gray-500">
-          Welcome back! Here's your meal summary.
-        </p>
+      <div className="pointer-events-none absolute top-96 -left-20 h-72 w-72 rounded-full bg-amber-300/10 blur-3xl" />
 
-        <div className="mt-6">
-          <MonthNavigation
-            currentDate={selectedDate}
-            setCurrentDate={setSelectedDate}
-          />
+      {/* 3D HERO SECTION */}
+      <div className="premium-section relative min-h-[460px] overflow-hidden rounded-3xl">
+
+        {/* Generated 3D scene */}
+        <img
+          src="/dashboard/mealmate-scene.png"
+          alt="MealMate 3D healthy meal scene"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+      
+
+        {/* Hero content */}
+        <div className="relative z-10 p-8 md:p-10">
+
+          <p className="mb-2 text-sm font-bold uppercase tracking-[0.3em] text-purple-600">
+            MealMate • Personal Dashboard
+          </p>
+
+          <h1 className="text-4xl font-black tracking-tight text-slate-900 md:text-5xl">
+            Dashboard
+          </h1>
+
+          <p className="mt-2 max-w-md text-slate-600">
+            Welcome back! Here's your meal summary.
+          </p>
+
+          {/* Month Navigation */}
+          <div className="mt-8 max-w-xl">
+            <MonthNavigation
+              currentDate={selectedDate}
+              setCurrentDate={setSelectedDate}
+            />
+          </div>
+
         </div>
       </div>
 
-      {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      {/* STAT CARDS */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 
-        <DashboardCard
-          title="Meals This Month"
-          value={totalMeals}
-          color="#16a34a"
-        />
+        {/* Meals */}
+        <div className="premium-card premium-shimmer premium-float rounded-3xl">
+          <div className="h-1.5 bg-gradient-to-r from-emerald-500 via-green-400 to-lime-300" />
 
-        <DashboardCard
-          title="Current Bill"
-          value={`₹${currentBill}`}
-          color="#2563eb"
-        />
+          <div className="p-5">
 
-        <DashboardCard
-          title="Advance"
-          value={`₹${monthlyAdvance}`}
-          color="#ea580c"
-        />
+            <div className="mb-4 flex items-center justify-between">
 
-        <DashboardCard
-          title={balanceTitle}
-          value={`₹${Math.abs(remainingBalance)}`}
-          color={balanceColor}
-        />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-xl">
+                🍛
+              </div>
 
-        <DashboardCard
-          title="Pending Days"
-          value={pendingDays}
-          color="#dc2626"
-        />
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+                Meals
+              </span>
+
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Meals This Month
+            </p>
+
+            <p className="premium-number mt-2 text-4xl font-black text-slate-900">
+              {totalMeals}
+            </p>
+
+          </div>
+        </div>
+
+        {/* Billing */}
+        <div className="premium-card premium-shimmer rounded-3xl">
+          <div className="h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-400" />
+
+          <div className="p-5">
+
+            <div className="mb-4 flex items-center justify-between">
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100 text-xl">
+                💳
+              </div>
+
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                Billing
+              </span>
+
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Current Bill
+            </p>
+
+            <p className="premium-number mt-2 text-4xl font-black text-slate-900">
+              ₹{currentBill}
+            </p>
+
+          </div>
+        </div>
+
+        {/* Advance */}
+        <div className="premium-card premium-shimmer rounded-3xl">
+          <div className="h-1.5 bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300" />
+
+          <div className="p-5">
+
+            <div className="mb-4 flex items-center justify-between">
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-100 text-xl">
+                💰
+              </div>
+
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+                Advance
+              </span>
+
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Monthly Advance
+            </p>
+
+            <p className="premium-number mt-2 text-4xl font-black text-slate-900">
+              ₹{monthlyAdvance}
+            </p>
+
+          </div>
+        </div>
+
+        {/* Balance */}
+        <div className="premium-card premium-glow rounded-3xl">
+
+          <div
+            className={`h-1.5 ${
+              remainingBalance >= 0
+                ? "bg-gradient-to-r from-emerald-500 to-green-300"
+                : "bg-gradient-to-r from-red-600 to-orange-400"
+            }`}
+          />
+
+          <div className="p-5">
+
+            <div className="mb-4 flex items-center justify-between">
+
+              <div
+                className={`flex h-11 w-11 items-center justify-center rounded-2xl text-xl ${
+                  remainingBalance >= 0
+                    ? "bg-emerald-100"
+                    : "bg-red-100"
+                }`}
+              >
+                {remainingBalance >= 0 ? "✅" : "⚠️"}
+              </div>
+
+              <span
+                className={`text-xs font-bold uppercase tracking-wider ${
+                  remainingBalance >= 0
+                    ? "text-emerald-600"
+                    : "text-red-600"
+                }`}
+              >
+                {balanceTitle}
+              </span>
+
+            </div>
+
+            <p className="text-sm text-slate-500">
+              {balanceTitle}
+            </p>
+
+            <p
+              className={`premium-number mt-2 text-4xl font-black ${
+                remainingBalance >= 0
+                  ? "text-emerald-600"
+                  : "text-red-600"
+              }`}
+            >
+              ₹{Math.abs(remainingBalance)}
+            </p>
+
+          </div>
+        </div>
+
+        {/* Pending Days */}
+        <div className="premium-card rounded-3xl">
+
+          <div className="h-1.5 bg-gradient-to-r from-rose-600 via-red-500 to-orange-300" />
+
+          <div className="p-5">
+
+            <div className="mb-4 flex items-center justify-between">
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-100 text-xl">
+                📅
+              </div>
+
+              <span className="text-xs font-bold uppercase tracking-wider text-red-600">
+                Days
+              </span>
+
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Pending Days
+            </p>
+
+            <p className="premium-number mt-2 text-4xl font-black text-slate-900">
+              {pendingDays}
+            </p>
+
+          </div>
+        </div>
 
       </div>
 
-      {/* Main Dashboard Sections */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      {/* MAIN SECTIONS */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
-        {/* Monthly Summary */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
+        {/* MONTHLY SUMMARY */}
+        <div className="premium-section premium-glow rounded-3xl p-6">
 
-          <h2 className="text-2xl font-bold mb-6">
-            Monthly Summary
-          </h2>
+          <div className="mb-6 flex items-center justify-between">
+
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-purple-600">
+                Overview
+              </p>
+
+              <h2 className="mt-1 text-2xl font-black text-slate-900">
+                Monthly Summary
+              </h2>
+            </div>
+
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-xl text-white shadow-lg">
+              📊
+            </div>
+
+          </div>
 
           <div className="space-y-4">
 
-            <div className="flex justify-between">
-              <span>Meal Price</span>
-              <span>₹{mealPrice}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Meals Eaten</span>
-              <span>{totalMeals}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Meal Cost</span>
-              <span>₹{currentBill}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Advance</span>
-              <span>₹{monthlyAdvance}</span>
-            </div>
-
-            <hr />
-
-            <div className="flex justify-between text-lg font-bold">
-
-              <span>{balanceTitle}</span>
-
-              <span
-                className={
-                  remainingBalance >= 0
-                    ? "text-green-600"
-                    : "text-red-600"
-                }
-              >
-                ₹{Math.abs(remainingBalance)}
+            <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+              <span className="text-slate-500">
+                Meal Price
               </span>
 
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Total Amount to Settle */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-
-          <h2 className="text-2xl font-bold mb-6">
-            💰 Total Amount to Settle
-          </h2>
-
-          <div className="text-4xl font-bold text-red-600 mb-6">
-            ₹{totalAmountToSettle}
-          </div>
-
-          <div className="space-y-3">
-
-            <div className="flex justify-between">
-              <span>Previous Pending Due</span>
-
-              <span className="font-semibold">
-                ₹{totalPreviousDue}
+              <span className="font-bold text-slate-900">
+                ₹{mealPrice}
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span>Current Month Bill</span>
+            <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+              <span className="text-slate-500">
+                Meals Eaten
+              </span>
 
-              <span className="font-semibold">
+              <span className="font-bold text-emerald-600">
+                {totalMeals}
+              </span>
+            </div>
+
+            <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+              <span className="text-slate-500">
+                Meal Cost
+              </span>
+
+              <span className="font-bold text-blue-600">
                 ₹{currentBill}
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span>Current Month Advance</span>
-
-              <span className="font-semibold text-green-600">
-                - ₹{monthlyAdvance}
+            <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+              <span className="text-slate-500">
+                Advance
               </span>
+
+              <span className="font-bold text-orange-600">
+                ₹{monthlyAdvance}
+              </span>
+            </div>
+
+            <div className="premium-divider my-5" />
+
+            <div
+              className={`rounded-2xl p-5 ${
+                remainingBalance >= 0
+                  ? "bg-gradient-to-br from-emerald-50 to-green-100"
+                  : "bg-gradient-to-br from-red-50 to-orange-100"
+              }`}
+            >
+
+              <div className="flex items-center justify-between">
+
+                <span className="font-bold text-slate-700">
+                  {balanceTitle}
+                </span>
+
+                <span
+                  className={`text-2xl font-black ${
+                    remainingBalance >= 0
+                      ? "text-emerald-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  ₹{Math.abs(remainingBalance)}
+                </span>
+
+              </div>
+
             </div>
 
           </div>
 
-          {/* Last 3 Pending Months */}
-          {previousDues.length > 0 && (
-            <>
-              <hr className="my-6" />
+        </div>
 
-              <h3 className="text-lg font-bold mb-4">
-                Previous Pending Dues
-              </h3>
+        {/* TOTAL SETTLEMENT */}
+        <div className="premium-section premium-glow relative overflow-hidden rounded-3xl p-6">
 
-              <div className="space-y-3">
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl" />
 
-                {previousDues.map((due) => (
-                  <div
-                    key={`${due.year}-${due.month}`}
-                    className="flex justify-between items-center bg-red-50 border border-red-100 rounded-xl p-3"
-                  >
+          <div className="relative z-10">
 
-                    <span className="font-medium">
-                      {new Date(
-                        due.year,
-                        due.month - 1
-                      ).toLocaleString("en-IN", {
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
+            <div className="mb-6 flex items-center justify-between">
 
-                    <span className="font-bold text-red-600">
-                      ₹{due.amount}
-                    </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-600">
+                  Settlement
+                </p>
 
-                  </div>
-                ))}
+                <h2 className="mt-1 text-2xl font-black text-slate-900">
+                  Total Amount to Settle
+                </h2>
+              </div>
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-xl text-white shadow-lg">
+                💰
+              </div>
+
+            </div>
+
+            {/* Main Amount */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 p-7 text-white shadow-2xl">
+
+              <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-purple-400/20 blur-3xl" />
+
+              <p className="relative text-sm font-medium text-slate-300">
+                Total amount for this month
+              </p>
+
+              <p className="premium-number relative mt-2 text-5xl font-black tracking-tight">
+                ₹{totalAmountToSettle}
+              </p>
+
+              <p className="relative mt-2 text-xs text-slate-400">
+                Previous pending dues + current month bill
+              </p>
+
+            </div>
+
+            {/* Breakdown */}
+            <div className="mt-6 space-y-3">
+
+              <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+
+                <span className="text-slate-500">
+                  Previous Pending Due
+                </span>
+
+                <span className="font-bold text-red-600">
+                  ₹{totalPreviousDue}
+                </span>
 
               </div>
-            </>
-          )}
 
+              <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+
+                <span className="text-slate-500">
+                  Current Month Bill
+                </span>
+
+                <span className="font-bold text-blue-600">
+                  ₹{currentBill}
+                </span>
+
+              </div>
+
+              <div className="premium-card flex items-center justify-between rounded-2xl p-4">
+
+                <span className="text-slate-500">
+                  Current Month Advance
+                </span>
+
+                <span className="font-bold text-emerald-600">
+                  - ₹{monthlyAdvance}
+                </span>
+
+              </div>
+
+            </div>
+
+            {/* Previous Pending Dues */}
+            {previousDues.length > 0 && (
+              <div className="mt-7">
+
+                <div className="premium-divider mb-6" />
+
+                <div className="mb-4">
+
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">
+                    History
+                  </p>
+
+                  <h3 className="mt-1 text-lg font-black text-slate-900">
+                    Previous Pending Dues
+                  </h3>
+
+                </div>
+
+                <div className="space-y-3">
+
+                  {previousDues.map((due, index) => (
+                    <div
+                      key={`${due.year}-${due.month}`}
+                      className="premium-card flex items-center justify-between rounded-2xl border-red-100 bg-gradient-to-r from-red-50 to-orange-50 p-4"
+                    >
+
+                      <div className="flex items-center gap-3">
+
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 font-bold text-red-600">
+                          {index + 1}
+                        </div>
+
+                        <div>
+
+                          <p className="font-bold text-slate-800">
+                            {new Date(
+                              due.year,
+                              due.month - 1
+                            ).toLocaleString("en-IN", {
+                              month: "long",
+                              year: "numeric",
+                            })}
+                          </p>
+
+                          <p className="text-xs text-slate-500">
+                            Pending balance
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      <span className="font-black text-red-600">
+                        ₹{due.amount}
+                      </span>
+
+                    </div>
+                  ))}
+
+                </div>
+
+              </div>
+            )}
+
+          </div>
         </div>
 
       </div>
+
     </div>
   );
 }
