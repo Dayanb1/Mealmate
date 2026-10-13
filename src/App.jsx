@@ -197,6 +197,8 @@ function App() {
                     <Calendar
                       mealData={mealData}
                       setMealData={setMealData}
+                      mealPrice={mealPrice}
+                      monthlyAdvance={monthlyAdvance}
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
                       loadMeals={loadMeals}
